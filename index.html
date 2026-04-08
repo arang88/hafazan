@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hafazan</title>
+  <style>
+    :root {
+      --text: #24313a;
+      --muted: #5b707d;
+      --card: rgba(255, 255, 255, 0.93);
+      --shadow: 0 16px 40px rgba(31, 60, 42, 0.15);
+      --radius: 26px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Comic Sans MS", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(255,255,255,0.9) 0 8%, transparent 8.1%),
+        radial-gradient(circle at 85% 12%, rgba(255,255,255,0.75) 0 7%, transparent 7.1%),
+        radial-gradient(circle at 30% 30%, rgba(255,230,120,0.18) 0 12%, transparent 12.1%),
+        linear-gradient(180deg, #9be9ff 0%, #d7fff5 34%, #f7fff5 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: auto auto 0 0;
+      width: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      height: 170px;
+      background:
+        radial-gradient(circle at 8% 100%, #86d37a 0 21%, transparent 21.2%),
+        radial-gradient(circle at 18% 100%, #73c468 0 18%, transparent 18.2%),
+        radial-gradient(circle at 32% 100%, #98dc8a 0 20%, transparent 20.2%),
+        radial-gradient(circle at 47% 100%, #7acc6f 0 22%, transparent 22.2%),
+        radial-gradient(circle at 63% 100%, #8fdc81 0 19%, transparent 19.2%),
+        radial-gradient(circle at 79% 100%, #74c56a 0 17%, transparent 17.2%),
+        radial-gradient(circle at 92% 100%, #8ee18b 0 20%, transparent 20.2%);
+      opacity: 0.9;
+    }
+
+    body::after {
+      height: 85px;
+      background: linear-gradient(180deg, transparent 0%, rgba(119,200,112,0.15) 20%, rgba(119,200,112,0.45) 100%);
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 22px 18px 120px;
+    }
+
+    .hero,
+    .card {
+      background: var(--card);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      border: 3px solid rgba(255,255,255,0.85);
+      backdrop-filter: blur(6px);
+    }
+
+    .hero {
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: #16653f;
+    }
+
+    .hero p {
+      margin: 0;
+      font-size: 1.05rem;
+      color: var(--muted);
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .badge {
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      background: white;
+      box-shadow: 0 8px 20px rgba(70,109,84,0.12);
+    }
+
+    .card {
+      padding: 18px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 10px;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      color: #13553b;
+    }
+
+    .section-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .hidden { display: none !important; }
+
+    .surah-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .surah-card {
+      background: linear-gradient(180deg, #ffffff, #f7faff);
+      padding: 16px;
+      border-radius: 22px;
+      box-shadow: 0 12px 24px rgba(28,45,66,0.1);
+      border: 2px solid rgba(123,97,255,0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .surah-card h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      color: #20304f;
+    }
+
+    .surah-card .tag {
+      display: inline-flex;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #f0ebff;
+      color: #5a43d2;
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 900;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-2px) scale(1.01); }
+    button:active { transform: translateY(0) scale(0.98); }
+
+    .small-btn,
+    .nav-btn {
+      background: white;
+      color: var(--text);
+      box-shadow: 0 12px 24px rgba(48,82,69,0.10);
+      border-radius: 22px;
+      padding: 14px 16px;
+      font-size: 1rem;
+    }
+
+    .nav-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .audio-hint {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .ayah-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .ayah-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+      background: linear-gradient(180deg, #fff, #f6fff9);
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: 0 12px 22px rgba(28,63,39,0.08);
+      border: 2px solid rgba(46,194,126,0.1);
+    }
+
+    .ayah-badge {
+      min-width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #ffb703, #ffd86d);
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: #5a3d00;
+      box-shadow: 0 10px 18px rgba(255,183,3,0.2);
+      padding: 0 10px;
+    }
+
+    .ayah-text {
+      font-size: clamp(1.25rem, 3vw, 2rem);
+      line-height: 1.9;
+      text-align: right;
+      direction: rtl;
+      color: #183020;
+    }
+
+    .icon-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #7b61ff, #57c7ff);
+      color: white;
+      font-size: 1.6rem;
+      box-shadow: 0 14px 24px rgba(73,82,190,0.22);
+    }
+
+    .note {
+      margin-top: 18px;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.82);
+      border-radius: 18px;
+      color: var(--muted);
+      font-size: 0.96rem;
+      box-shadow: 0 8px 18px rgba(38,54,66,0.08);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 26px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    @media (max-width: 860px) {
+      .ayah-card { grid-template-columns: 1fr; text-align: center; }
+      .ayah-text { text-align: right; }
+      .icon-btn { width: 100%; height: 56px; }
+    }
+
+    @media (max-width: 560px) {
+      .app { padding: 14px 12px 110px; }
+      .hero { padding: 16px; border-radius: 24px; }
+      .card { padding: 14px; border-radius: 22px; }
+      .small-btn, .nav-btn { font-size: 0.98rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div>
+        <h1>Hafazan</h1>
+        <p>Semak hafazan ayat demi ayat dengan paparan berasingan dan audio yang mudah dimainkan.</p>
+        <div class="hero-badges">
+          <span class="badge">📖 Surah berasingan</span>
+          <span class="badge">🕌 Bismillah diasingkan</span>
+          <span class="badge">🎧 Audio setiap ayat</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="hafazanListView" class="card">
+      <h2 class="section-title">📖 Senarai Surah Hafazan</h2>
+      <p class="section-subtitle">Pilih surah. Setiap ayat akan dipaparkan berasingan bersama butang audio.</p>
+      <div class="surah-grid" id="surahGrid"></div>
+      <div class="nav-row">
+       
+      </div>
+    </section>
+
+    <section id="surahView" class="card hidden">
+      <h2 class="section-title" id="surahTitle">📘 Surah</h2>
+      <p class="section-subtitle" id="surahSubtitle">Ayat demi ayat untuk semakan hafazan.</p>
+      <div class="audio-hint">🔊 Tekan butang audio di sebelah ayat untuk memainkan bacaan.</div>
+      <div id="surahContent" class="ayah-list"></div>
+      <div class="nav-row">
+        <button class="nav-btn" onclick="goSurahList()">📚 Pilih Surah Lain</button>
+        <button class="nav-btn" onclick="window.location.href='matematik.html'">🔢 Matematik</button>
+      </div>
+      <div class="note">Nota: Bahagian hafazan memerlukan sambungan internet untuk memuatkan teks ayat dan audio.</div>
+    </section>
+  </div>
+
+  <script>
+    const BASMALAH_AUDIO_URL = 'https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3';
+
+    const surahs = [
+      { number: 1, name: 'Al-Fatihah', verses: 7 },
+      { number: 114, name: 'An-Nas', verses: 6 },
+      { number: 112, name: 'Al-Ikhlas', verses: 4 },
+      { number: 113, name: 'Al-Falaq', verses: 5 },
+      { number: 111, name: 'Al-Masad', verses: 5 },
+      { number: 110, name: 'An-Nasr', verses: 3 },
+      { number: 109, name: 'Al-Kafirun', verses: 6 },
+      { number: 108, name: 'Al-Kauthar', verses: 3 },
+      { number: 107, name: "Al-Ma'un", verses: 7 },
+      { number: 106, name: 'Al-Quraisy', verses: 4 },
+    ];
+
+    const hafazanListView = document.getElementById('hafazanListView');
+    const surahView = document.getElementById('surahView');
+    const surahGrid = document.getElementById('surahGrid');
+    const surahTitle = document.getElementById('surahTitle');
+    const surahSubtitle = document.getElementById('surahSubtitle');
+    const surahContent = document.getElementById('surahContent');
+
+    let player = null;
+    let activeAudioBtn = null;
+
+    function renderSurahList() {
+      surahGrid.innerHTML = '';
+      surahs.forEach((surah) => {
+        const card = document.createElement('div');
+        card.className = 'surah-card';
+        card.innerHTML = `
+          <span class="tag">Surah ${surah.number}</span>
+          <h3>${surah.name}</h3>
+          <div>${surah.verses} ayat</div>
+          <button class="small-btn" onclick="loadSurah(${surah.number})">Buka Surah</button>
+        `;
+        surahGrid.appendChild(card);
+      });
+    }
+
+    function goSurahList() {
+      stopAudio();
+      surahView.classList.add('hidden');
+      hafazanListView.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function splitBasmalaFromText(text = '') {
+      const forms = [
+        'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+        'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ',
+        'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ'
+      ];
+
+      for (const form of forms) {
+        if (text.startsWith(form)) {
+          const remaining = text.slice(form.length).trim();
+          return {
+            basmala: form,
+            remainingText: remaining
+          };
+        }
+      }
+      return null;
+    }
+
+    function mapNormalAyah(ayah) {
+      return {
+        badge: ayah.numberInSurah,
+        text: ayah.text,
+        audioUrl: `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayah.number}.mp3`,
+        title: `Mainkan audio ayat ${ayah.numberInSurah}`
+      };
+    }
+
+    function buildDisplayAyahs(surahNumber, ayahs) {
+      if (!ayahs || !ayahs.length) return [];
+
+      if (surahNumber === 1 || surahNumber === 9) {
+        return ayahs.map(mapNormalAyah);
+      }
+
+      const firstAyah = ayahs[0];
+      const split = splitBasmalaFromText(firstAyah.text);
+
+      if (!split || !split.remainingText) {
+        return ayahs.map(mapNormalAyah);
+      }
+
+      const result = [
+        {
+          badge: 'بس',
+          text: split.basmala,
+          audioUrl: BASMALAH_AUDIO_URL,
+          title: 'Mainkan audio Bismillah'
+        },
+        {
+          badge: firstAyah.numberInSurah,
+          text: split.remainingText,
+          audioUrl: `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${firstAyah.number}.mp3`,
+          title: `Mainkan audio ayat ${firstAyah.numberInSurah}`
+        }
+      ];
+
+      ayahs.slice(1).forEach((ayah) => result.push(mapNormalAyah(ayah)));
+      return result;
+    }
+
+    async function loadSurah(number) {
+      stopAudio();
+      const selected = surahs.find(s => s.number === number);
+      if (!selected) return;
+
+      surahTitle.textContent = `📘 Surah ${selected.name}`;
+      surahSubtitle.textContent = `Memaparkan ${selected.verses} ayat secara berasingan.`;
+      surahContent.innerHTML = '<div class="loading">Memuatkan ayat... ⏳</div>';
+
+      hafazanListView.classList.add('hidden');
+      surahView.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      try {
+        const res = await fetch(`https://api.alquran.cloud/v1/surah/${number}/quran-uthmani`);
+        if (!res.ok) throw new Error('Gagal memuatkan data surah');
+
+        const data = await res.json();
+        const ayahs = data?.data?.ayahs || [];
+        if (!ayahs.length) throw new Error('Tiada ayat ditemui');
+
+        const displayAyahs = buildDisplayAyahs(number, ayahs);
+
+        surahContent.innerHTML = '';
+        displayAyahs.forEach((item) => {
+          const card = document.createElement('div');
+          card.className = 'ayah-card';
+          card.innerHTML = `
+            <div class="ayah-badge">${item.badge}</div>
+            <div class="ayah-text">${item.text}</div>
+            <button class="icon-btn" title="${item.title}">▶️</button>
+          `;
+
+          const btn = card.querySelector('.icon-btn');
+          btn.addEventListener('click', () => playAyah(item.audioUrl, btn));
+          surahContent.appendChild(card);
+        });
+      } catch (error) {
+        surahContent.innerHTML = `
+          <div class="note" style="color:#7a1b1b; background:#fff4f4;">
+            Tidak dapat memuatkan surah sekarang. Sila semak sambungan internet dan cuba lagi.<br><br>
+            <strong>Ralat:</strong> ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    function playAyah(url, btn) {
+      if (player && player.src === url && !player.paused) {
+        stopAudio();
+        return;
+      }
+
+      stopAudio();
+      player = new Audio(url);
+      activeAudioBtn = btn;
+      activeAudioBtn.textContent = '⏸️';
+
+      player.play().catch(() => {
+        if (activeAudioBtn) activeAudioBtn.textContent = '▶️';
+        alert('Audio tidak dapat dimainkan sekarang. Sila cuba lagi.');
+      });
+
+      player.addEventListener('ended', stopAudio);
+      player.addEventListener('error', stopAudio);
+    }
+
+    function stopAudio() {
+      if (player) {
+        player.pause();
+        player.currentTime = 0;
+      }
+      if (activeAudioBtn) activeAudioBtn.textContent = '▶️';
+      player = null;
+      activeAudioBtn = null;
+    }
+
+    renderSurahList();
+  </script>
+</body>
+</html>
